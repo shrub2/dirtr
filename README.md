@@ -3,5 +3,6 @@
 Shows a tree of directories.
 
 To-do list:
-- [ ] Implement scrolling
 - [x] Implement tree structure for storing path directories
+- [ ] Implement tree navigation
+- [ ] Add graphics for tree representation
