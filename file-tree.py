@@ -47,8 +47,37 @@ class Node:
         else:
             return self.children[n // 2 - 1]
 
-
 # class Node end
+
+
+class Navigation:
+    def __init__(self, file_tree):
+        self.curr_pos = file_tree
+
+    def move_down(self):
+        curr_pos = self.curr_pos.get_middle_child()
+        if curr_pos is not None:
+            self.curr_pos = curr_pos
+
+    def move_up(self):
+        curr_pos = self.curr_pos.parent
+        if curr_pos is not None:
+            self.curr_pos = curr_pos
+
+    def move_right(self):
+        curr_pos = self.curr_pos.get_right_sibling()
+        if curr_pos is not None:
+            self.curr_pos = curr_pos
+
+    def move_left(self):
+        curr_pos = self.curr_pos.get_left_sibling()
+        if curr_pos is not None:
+            self.curr_pos = curr_pos
+
+    def get_data(self):
+        return self.curr_pos.data
+
+# class Navigation end
 
 
 def FileTree(path):
@@ -68,45 +97,28 @@ cwd = os.getcwd()
 
 file_tree = FileTree(cwd)
 
-
-### Debugging ###
-
-#index = 3
-#
-#print(file_tree.children[0].children[index].get_left_sibling().data)
-#print(file_tree.children[0].children[index].data)
-#print(file_tree.children[0].children[index].get_right_sibling().data)
-#print("\n")
-#for child in file_tree.children[0].children:
-#    print(child.data)
-#
-#print(file_tree.children[0].get_middle_child().data)
-
-###########################
-
-
-#text_lines = []
-#for root, dirs, files in os.walk(cwd):
-    #for dir in dirs:
-        #text_lines.append(os.path.join(root, dir))
-
-#text = "\n".join(text_lines)
-
+curr_pos = Navigation(file_tree)
 
 # Curses
-#def main(stdscr):
-#    stdscr.scrollok(True)
-#    stdscr.clear()
-#
-#    stdscr.addstr(text)
-#
-#    stdscr.refresh()
-#    while(True):
-#        key = stdscr.getch()
-#        if key == ord('q'):
-#            break
-#
-#wrapper(main)
+def main(stdscr):
+    stdscr.scrollok(True)
+    while(True):
+        stdscr.clear()
+        stdscr.addstr(curr_pos.get_data())
+        stdscr.refresh()
+        key = stdscr.getch()
+        if key == ord('q'):
+            break
+        elif key == curses.KEY_DOWN:
+            curr_pos.move_down()
+        elif key == curses.KEY_UP:
+            curr_pos.move_up()
+        elif key == curses.KEY_RIGHT:
+            curr_pos.move_right()
+        elif key == curses.KEY_LEFT:
+            curr_pos.move_left()
+
+wrapper(main)
 
 
 
