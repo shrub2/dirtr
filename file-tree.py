@@ -1,10 +1,12 @@
 import curses
 from curses import wrapper
 import os
+import subprocess
 
 class Node:
-    def __init__(self, data = None):
-        self.data = data
+    def __init__(self, full_path = None):
+        self.full_path = full_path
+        self.dir = os.path.basename(full_path) if full_path else None
         self.children = []
         self.parent = None
     
@@ -74,8 +76,17 @@ class Navigation:
         if curr_pos is not None:
             self.curr_pos = curr_pos
 
-    def get_data(self):
-        return self.curr_pos.data
+    def get_full_path(self):
+        return self.curr_pos.full_path
+
+    def get_dir(self):
+        return self.curr_pos.dir
+
+    def get_children(self):
+        return self.curr_pos.children
+
+    def get_parent(self):
+        return self.curr_pos.parent
 
 # class Navigation end
 
@@ -101,11 +112,30 @@ curr_pos = Navigation(file_tree)
 
 # Curses
 def main(stdscr):
+    curses.curs_set(0)
     stdscr.scrollok(True)
+
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_WHITE)
+
+    curr_pos.move_down()
+
     while(True):
         stdscr.clear()
-        stdscr.addstr(curr_pos.get_data())
-        stdscr.refresh()
+
+        stdscr.addstr(curr_pos.get_full_path())
+        stdscr.addstr("\n")
+
+        if(curr_pos.get_parent() is not None):
+            for child in curr_pos.get_parent().children:
+                if child.dir == curr_pos.get_dir():
+                    stdscr.addstr(child.dir, curses.color_pair(2))
+                else:
+                    stdscr.addstr(child.dir, curses.color_pair(1))
+                stdscr.addstr(' ')
+            stdscr.refresh()
+
         key = stdscr.getch()
         if key == ord('q'):
             break
@@ -118,7 +148,9 @@ def main(stdscr):
         elif key == curses.KEY_LEFT:
             curr_pos.move_left()
 
-wrapper(main)
-
+try:
+    wrapper(main)
+except KeyboardInterrupt:
+    pass
 
 
